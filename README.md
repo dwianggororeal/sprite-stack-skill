@@ -1,32 +1,32 @@
 # sprite-stack
 
-Skill prosedural untuk membangun objek pixel art pseudo-3D dengan teknik **sprite stacking** secara *codely* (Python + HTML Canvas), tanpa bergantung pada generator eksternal.
+A procedural skill for building pseudo-3D pixel art objects and articulated characters via **sprite stacking** directly in code (Python + HTML Canvas), with zero external generator dependencies.
 
-## Alur Kerja 2 Langkah
+## 2-Step Workflow
 
-1. **Generate Sprite Sheet `.png` Fisik (Python)**
-   - Menggunakan Pillow / NumPy untuk merender irisan horizontal *bottom-to-top* (`z = 0..N-1`) ke dalam strip RGBA transparan `(W * N) × H`, atau grid `(W * N) × (H * F)` untuk sprite beranimasi (*F* frame).
-   - Default memakai irisan isotropik padat **1:1** (`zScale = 1`) dan pengukuran rasio landmark referensi agar proporsi anatomi akurat.
-   - Mendukung **High-Detail Sculpted Mode**: pemodelan sub-otot + *silhouette breakup* (cakar, bulu/surai runcing, pita, duri) + *3D Surface Normal & Cavity AO Shader*.
+1. **Generate Physical `.png` Slice Sheets (Python)**
+   - Uses Pillow / NumPy to render bottom-to-top horizontal slices (`z = 0..N-1`) into a transparent RGBA strip `(W * N) × H`, or a multi-row grid `(W * N) × (H * totalRows)` for animated sprites.
+   - Defaults to dense **1:1 isotropic voxel slicing** (`zScale = 1`) and normalized reference landmark measurement (`0.0..1.0`) for accurate anatomy and proportions.
+   - Supports **High-Detail Sculpted Mode** (sub-muscle sculpting, 3D silhouette breakup tufts/claws/cloth, and vectorized 3D surface-normal + `3×3×3` cavity-AO shading) and **Multi-State FK Animation** (fixed-bone 3D Forward Kinematics, spherical joint bridges, automatic ground-contact Z-pinning, and state rows like `idle`, `walk`, `run`, `jump`, `crouch`).
 
-2. **Testing & Showcase Interaktif di HTML (`file://`-safe)**
-   - Memuat file `.png` fisik secara langsung via `ctx.drawImage(...)` (aman dibuka langsung lewat `file://` tanpa error CORS `tainted canvas`).
-   - **Proyeksi Ortografis 3D (`Pitch` `-90°..+90°`)**: pasangan `sin(pitch)` & `cos(pitch)` terpusat di tengah tinggi objek dengan *painter's order* penuh dari atas maupun bawah.
-   - **Lossless Hybrid Renderer + Anti-Gap Extrusion**: sub-step vertikal saat pitch tinggi dan *pre-rotated back-to-front row-blitting* saat pitch rendah (`0°..15°`) agar tidak ada baris wajah yang hilang maupun celah *scanline*, lengkap dengan *dirty-state caching*.
-   - **Kontrol Mouse**: Left-drag untuk Rotate & Pitch, Right/Middle/Shift-drag untuk Pan, Mouse Wheel untuk Zoom, Double-click untuk Reset.
+2. **Interactive `file://`-Safe HTML 3D Showcase**
+   - Loads the physical `.png` directly via `ctx.drawImage(...)` (works safely from `file://` without CORS tainted-canvas errors).
+   - **Coupled 3D Orthographic Pitch (`-90°..+90°`)**: pairs `sin(pitch)` & `cos(pitch)` centered on the object's vertical midpoint with full top/bottom painter's ordering.
+   - **Lossless Hybrid 3D Renderer + Anti-Gap Extrusion**: uses dirty-state signature caching, fast vertical sub-steps at steep pitch, and adaptive pre-rotated back-to-front row-blitting at shallow pitch (`0°..15°`) so front details never drop out and scanline gaps never appear.
+   - **Mouse Viewport Controls**: Left-drag to Rotate & Pitch, Right/Middle/Shift-drag to Pan, Mouse Wheel to Zoom, and Double-click to Reset.
 
-## Instalasi & Pemakaian
+## Installation & Usage
 
-Salin atau clone folder ini ke direktori global skill Antigravity:
+Clone into your global Antigravity skills folder:
 
 ```bash
 git clone https://github.com/dwianggororeal/sprite-stack-skill.git ~/.gemini/config/skills/sprite-stack
 ```
 
-Atau di Windows PowerShell:
+Or on Windows PowerShell:
 
 ```powershell
 git clone https://github.com/dwianggororeal/sprite-stack-skill.git "$env:USERPROFILE\.gemini\config\skills\sprite-stack"
 ```
 
-Panggil di chat dengan `/sprite-stack` atau minta pembuatan *sprite stack* / *fake 3D pixel art* dari ide maupun gambar referensi.
+Invoke with `/sprite-stack` in chat or ask to generate a sprite stack / fake 3D pixel art model from a prompt or reference image.
